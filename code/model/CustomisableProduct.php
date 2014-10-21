@@ -2,7 +2,10 @@
 
 class CustomisableProduct extends Product {
 
-    private static $description = "A product that can be modified by the customor";
+    /**
+     * @config
+     */
+    private static $description = "A product that can be modified by the customer";
 
     private static $has_many = array(
         "Customisations"=> "ProductCustomisation"

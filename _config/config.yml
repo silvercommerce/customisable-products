@@ -1,0 +1,8 @@
+---
+Name: customisableproduct
+After: 'framework/*','cms/*'
+---
+# Extensions
+ShoppingCart:
+  extensions:
+    - CustomisableProductShoppingCart
