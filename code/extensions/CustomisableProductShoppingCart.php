@@ -9,30 +9,26 @@ class CustomisableProductShoppingCart extends Extension {
      */
     public function augmentSetup() {
         foreach($this->owner->Items as $item) {
-            $object = ($item->StockID) ? CatalogueProduct::get()->filter("StockID", $item->StockID)->first() : null;
+            if($item->Customisations && is_array($item->Customisations)) {
+                $base_price = $item->Price->RAW();
+                $customisations = ArrayList::create();
 
-            if($object) {
-                if($item->Customisations && is_array($item->Customisations)) {
-                    $base_price = $item->Price->RAW();
-                    $customisations = ArrayList::create();
+                foreach($item->Customisations as $customisation) {
+                    if($customisation['Price'])
+                        $base_price += $customisation['Price'];
 
-                    foreach($item->Customisations as $customisation) {
-                        if($customisation['Price'])
-                            $base_price += $customisation['Price'];
-
-                        $customisations->add($customisation);
-                    }
-
-                    $item->Customisations = $customisations;
-                    $item->Price->setValue($base_price);
+                    $customisations->add($customisation);
                 }
 
-                // If tax rate set work out tax
-                if($item->TaxRate) {
-                    $tax = new Currency("Tax");
-                    $tax->setValue(($item->Price->RAW() / 100) * $item->TaxRate);
-                    $item->Tax = $tax;
-                }
+                $item->Customisations = $customisations;
+                $item->Price->setValue($base_price);
+            }
+
+            // If tax rate set work out tax
+            if($item->TaxRate) {
+                $tax = new Currency("Tax");
+                $tax->setValue(($item->Price->RAW() / 100) * $item->TaxRate);
+                $item->Tax = $tax;
             }
         }
     }
