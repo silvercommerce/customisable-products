@@ -26,9 +26,8 @@ class CustomisableProductShoppingCart extends Extension {
 
             // If tax rate set work out tax
             if($item->TaxRate) {
-                $tax = new Currency("Tax");
-                $tax->setValue(($item->Price->RAW() / 100) * $item->TaxRate);
-                $item->Tax = $tax;
+                $item->Tax = new Currency("Tax");
+                $item->Tax->setValue((($item->Price->RAW() - $item->Discount->RAW()) / 100) * $item->TaxRate);
             }
         }
     }
