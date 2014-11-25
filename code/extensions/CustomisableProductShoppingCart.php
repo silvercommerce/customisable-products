@@ -29,7 +29,7 @@ class CustomisableProductShoppingCart extends Extension {
             
             if($item->Price && $this->owner->discount) {
                 if($item->Price->RAW() && $this->owner->discount->Type == "Fixed" && $this->owner->discount->Amount)
-                    $item->Discount->setValue($this->owner->discount->Amount / $items->count());
+                    $item->Discount->setValue($this->owner->discount->Amount / $this->owner->Items->count());
                 elseif($item->Price && $this->owner->discount->Type == "Percentage" && $this->owner->discount->Amount)
                     $item->Discount->setValue(($item->Price->RAW() / 100) * $this->owner->discount->Amount);
             } else
