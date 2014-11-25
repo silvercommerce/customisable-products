@@ -23,6 +23,17 @@ class CustomisableProductShoppingCart extends Extension {
                 $item->Customisations = $customisations;
                 $item->Price->setValue($base_price);
             }
+            
+            // Calculate the discount
+            $item->Discount = new Currency("Discount");
+            
+            if($item->Price && $this->owner->discount) {
+                if($item->Price->RAW() && $this->owner->discount->Type == "Fixed" && $this->owner->discount->Amount)
+                    $item->Discount->setValue($this->owner->discount->Amount / $items->count());
+                elseif($item->Price && $this->owner->discount->Type == "Percentage" && $this->owner->discount->Amount)
+                    $item->Discount->setValue(($item->Price->RAW() / 100) * $this->owner->discount->Amount);
+            } else
+                $item->Discount->setValue(0);
 
             // If tax rate set work out tax
             if($item->TaxRate) {
