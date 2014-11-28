@@ -9,7 +9,7 @@ class CustomisableProductShoppingCart extends Extension {
      */
     public function augmentSetup() {
         foreach($this->owner->Items as $item) {
-            if($item->Customisations && is_array($item->Customisations)) {
+            if($item->BasePrice && $item->Customisations && is_array($item->Customisations)) {
                 $base_price = $item->BasePrice;
                 $customisations = ArrayList::create();
 
