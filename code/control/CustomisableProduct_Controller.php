@@ -34,10 +34,11 @@ class CustomisableProduct_Controller extends Product_Controller {
         $classname = $data["ClassName"];
         $id = $data["ID"];
         $customisations = array();
-
         $cart = ShoppingCart::get();
 
         if($object = $classname::get()->byID($id)) {
+            $price = $object->Price();
+        
             foreach($data as $key => $value) {
                 if(!(strpos($key, 'customise') === false) && $value) {
                     $custom_data = explode("_",$key);
@@ -51,16 +52,14 @@ class CustomisableProduct_Controller extends Product_Controller {
                                 ->Options()
                                 ->filter("Title",$value)
                                 ->first();
-                            $modify_price = ($option) ? $option->ModifyPrice : 0;
                         }
 
                         $customisations[] = array(
                             "Title" => $custom_item->Title,
                             "Value" => $value,
-                            "Price" => $modify_price,
+                            "Price" => $option->ModifyPrice
                         );
                     }
-
                 }
             }
 
@@ -69,18 +68,18 @@ class CustomisableProduct_Controller extends Product_Controller {
             else
                 $tax_rate = 0;
 
-            $item_to_add = new ArrayData(array(
+            $item_to_add = array(
+                "Key" => (int)$data['ID'] . ':' . base64_encode(json_encode($customisations)),
                 "Title" => $object->Title,
                 "Content" => $object->Content,
-                "BasePrice" => $object->Price(),
-                "Price" => $object->Price(),
+                "BasePrice" => $price,
                 "TaxRate" => $tax_rate,
-                "Customisations" => $customisations,
+                "CustomisationArray" => $customisations,
                 "Image" => $object->Images()->first(),
                 "StockID" => $object->StockID,
                 "ID" => $object->ID,
                 "ClassName" => $object->ClassName
-            ));
+            );
 
             $cart->add($item_to_add, $data['Quantity']);
             $cart->save();
