@@ -37,7 +37,7 @@ class CustomisableProduct_Controller extends Product_Controller {
         $cart = ShoppingCart::get();
 
         if($object = $classname::get()->byID($id)) {
-            $price = $object->Price();
+            $price = $object->Price;
         
             foreach($data as $key => $value) {
                 if(!(strpos($key, 'customise') === false) && $value) {
