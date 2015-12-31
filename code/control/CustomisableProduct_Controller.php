@@ -1,25 +1,27 @@
 <?php
 
-class CustomisableProduct_Controller extends Product_Controller {
+class CustomisableProduct_Controller extends Product_Controller
+{
 
-    static $allowed_actions = array(
+    public static $allowed_actions = array(
         'Form'
     );
 
-    public function Form() {
+    public function Form()
+    {
         $form = parent::Form();
         $object = $this->owner->dataRecord;
 
         $requirements = new RequiredFields(array("Quantity"));
 
         // If product colour customisations are set, add them to the item form
-        if($object->Customisations()->exists()) {
-            foreach($object->Customisations() as $customisation) {
+        if ($object->Customisations()->exists()) {
+            foreach ($object->Customisations() as $customisation) {
                 $field = $customisation->Field();
                 $form->Fields()->insertBefore($field, "Quantity");
 
                 // Check if field required
-                if($customisation->Required) {
+                if ($customisation->Required) {
                     $form
                         ->getValidator()
                         ->addRequiredField($field->getName());
@@ -30,27 +32,28 @@ class CustomisableProduct_Controller extends Product_Controller {
         return $form;
     }
 
-    public function doAddItemToCart($data, $form) {
+    public function doAddItemToCart($data, $form)
+    {
         $classname = $data["ClassName"];
         $id = $data["ID"];
         $customisations = array();
         $cart = ShoppingCart::get();
 
-        if($object = $classname::get()->byID($id)) {
+        if ($object = $classname::get()->byID($id)) {
             $price = $object->Price;
         
-            foreach($data as $key => $value) {
-                if(!(strpos($key, 'customise') === false) && $value) {
-                    $custom_data = explode("_",$key);
+            foreach ($data as $key => $value) {
+                if (!(strpos($key, 'customise') === false) && $value) {
+                    $custom_data = explode("_", $key);
 
-                    if($custom_item = ProductCustomisation::get()->byID($custom_data[1])) {
+                    if ($custom_item = ProductCustomisation::get()->byID($custom_data[1])) {
                         $modify_price = 0;
 
                         // Check if the current selected option has a price modification
-                        if($custom_item->Options()->exists()) {
+                        if ($custom_item->Options()->exists()) {
                             $option = $custom_item
                                 ->Options()
-                                ->filter("Title",$value)
+                                ->filter("Title", $value)
                                 ->first();
                         }
 
@@ -63,10 +66,11 @@ class CustomisableProduct_Controller extends Product_Controller {
                 }
             }
 
-            if($object->TaxRateID && $object->TaxRate()->Amount)
+            if ($object->TaxRateID && $object->TaxRate()->Amount) {
                 $tax_rate = $object->TaxRate()->Amount;
-            else
+            } else {
                 $tax_rate = 0;
+            }
 
             $item_to_add = array(
                 "Key" => (int)$data['ID'] . ':' . base64_encode(json_encode($customisations)),
@@ -103,4 +107,3 @@ class CustomisableProduct_Controller extends Product_Controller {
         return $this->redirectBack();
     }
 }
-

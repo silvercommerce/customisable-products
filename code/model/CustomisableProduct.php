@@ -1,6 +1,7 @@
 <?php
 
-class CustomisableProduct extends Product {
+class CustomisableProduct extends Product
+{
 
     /**
      * @config
@@ -11,7 +12,8 @@ class CustomisableProduct extends Product {
         "Customisations"=> "ProductCustomisation"
     );
 
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         $fields->removeByName("Root.Customisations");
@@ -47,5 +49,4 @@ class CustomisableProduct extends Product {
 
         return $fields;
     }
-
 }

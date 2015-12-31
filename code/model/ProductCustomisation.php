@@ -1,6 +1,7 @@
 <?php
 
-class ProductCustomisation extends DataObject {
+class ProductCustomisation extends DataObject
+{
     private static $db = array(
         'Title'     => 'Varchar',
         'Required'  => 'Boolean',
@@ -24,7 +25,8 @@ class ProductCustomisation extends DataObject {
 
     private static $default_sort = "\"Sort\" ASC";
 
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         $fields->removeByName('Options');
@@ -32,7 +34,7 @@ class ProductCustomisation extends DataObject {
         $fields->removeByName('Sort');
         $fields->removeByName('MaxLength');
 
-        if($this->ID && $this->DisplayAs != "TextEntry") {
+        if ($this->ID && $this->DisplayAs != "TextEntry") {
             $field_types = singleton('ProductCustomisationOption')->getFieldTypes();
 
             // Deal with product features
@@ -56,12 +58,12 @@ class ProductCustomisation extends DataObject {
             $fields->addFieldToTab('Root.Main', $options_field);
         }
 
-        if($this->ID && $this->DisplayAs == "TextEntry") {
-            $fields->addFieldToTab("Root.Main",TextField::create("MaxLength"));
+        if ($this->ID && $this->DisplayAs == "TextEntry") {
+            $fields->addFieldToTab("Root.Main", TextField::create("MaxLength"));
         }
 
-        if(!$this->ID) {
-            $fields->addFieldToTab('Root.Main',LiteralField::create('CreateWarning','<p>You need to create this before you can add options</p>'));
+        if (!$this->ID) {
+            $fields->addFieldToTab('Root.Main', LiteralField::create('CreateWarning', '<p>You need to create this before you can add options</p>'));
         }
 
         $this->extend('updateCMSFields', $fields);
@@ -70,7 +72,8 @@ class ProductCustomisation extends DataObject {
     }
 
     // Get the default options for this customisation
-    public function DefaultOptions() {
+    public function DefaultOptions()
+    {
         $options = $this->Options()->filter('Default', 1);
 
         $this->extend('updateDefaultOptions', $options);
@@ -83,18 +86,19 @@ class ProductCustomisation extends DataObject {
      *
      * @return FormField
      */
-    public function Field() {
-        if($this->Title && $this->DisplayAs) {
+    public function Field()
+    {
+        if ($this->Title && $this->DisplayAs) {
             $name = "customise_{$this->ID}_" . Convert::raw2url($this->Title);
             $title = ($this->Required) ? $this->Title . ' *' : $this->Title;
-            $options = $this->Options()->map('Title','ItemSummary');
+            $options = $this->Options()->map('Title', 'ItemSummary');
             $defaults = $this->DefaultOptions();
             $default = ($defaults->exists()) ? $defaults->first()->Title : null;
 
-            switch($this->DisplayAs) {
+            switch ($this->DisplayAs) {
                 case 'Dropdown':
                     $field = DropdownField::create($name, $title, $options, $default)
-                                ->setEmptyString(_t('Commerce.PleaseSelect','Please Select'));
+                                ->setEmptyString(_t('Commerce.PleaseSelect', 'Please Select'));
                     break;
                 case 'Radio':
                     $field = OptionSetField::create($name, $title, $options, $default);
@@ -104,44 +108,53 @@ class ProductCustomisation extends DataObject {
                     break;
                 case 'TextEntry':
                     $field = TextField::create($name, $title);
-                    if($this->MaxLength) $field->setMaxLength($this->MaxLength);
+                    if ($this->MaxLength) {
+                        $field->setMaxLength($this->MaxLength);
+                    }
                     break;
             }
 
             $this->extend('updateField', $field);
 
             return $field;
-        } else
+        } else {
             return false;
+        }
     }
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         // Delete all options when this opbect is deleted
-        foreach($this->Options() as $option) {
+        foreach ($this->Options() as $option) {
             $option->delete();
         }
 
         parent::onBeforeDelete();
     }
 
-    public function canView($member = false) {
+    public function canView($member = false)
+    {
         return $this->Parent()->canView($member);
     }
 
-    public function canCreate($member = null) {
+    public function canCreate($member = null)
+    {
         return $this->Parent()->canCreate($member);
     }
 
-    public function canEdit($member = null) {
+    public function canEdit($member = null)
+    {
         return $this->Parent()->canEdit($member);
     }
 
-    public function canDelete($member = null) {
+    public function canDelete($member = null)
+    {
         return $this->Parent()->canDelete($member);
     }
 }
 
-class ProductCustomisationOption extends DataObject {
+class ProductCustomisationOption extends DataObject
+{
     private static $db = array(
         'Title'         => 'Varchar',
         'ModifyPrice'   => 'Decimal',
@@ -178,7 +191,8 @@ class ProductCustomisationOption extends DataObject {
      *
      * @return Array of field names and types
      */
-    public function getFieldTypes() {
+    public function getFieldTypes()
+    {
         $fields = self::$field_types;
 
         $this->extend('updateFieldTypes', $fields);
@@ -186,39 +200,46 @@ class ProductCustomisationOption extends DataObject {
         return $fields;
     }
 
-    public function getItemSummary() {
+    public function getItemSummary()
+    {
         $modify_price = $this->ModifyPrice;
         $price = new Currency();
         $tax_id = $this->Parent()->Parent()->TaxRateID;
 
-        if($tax_id && Catalogue::config()->price_includes_tax)
+        if ($tax_id && Catalogue::config()->price_includes_tax) {
             $modify_price += ($modify_price / 100) * $this->Parent()->Parent()->TaxRate()->Amount;
+        }
 
         $price->setValue($modify_price);
 
-        if($price->RAW() > 0)
+        if ($price->RAW() > 0) {
             $summary = $this->Title . ' (' . $price->nice() . ')';
-        else
+        } else {
             $summary = $this->Title;
+        }
 
         $this->extend('updateItemSummary', $summary);
 
         return $summary;
     }
 
-    public function canView($member = false) {
+    public function canView($member = false)
+    {
         return $this->Parent()->canView($member);
     }
 
-    public function canCreate($member = null) {
+    public function canCreate($member = null)
+    {
         return $this->Parent()->canCreate($member);
     }
 
-    public function canEdit($member = null) {
+    public function canEdit($member = null)
+    {
         return $this->Parent()->canEdit($member);
     }
 
-    public function canDelete($member = null) {
+    public function canDelete($member = null)
+    {
         return $this->Parent()->canDelete($member);
     }
 }
