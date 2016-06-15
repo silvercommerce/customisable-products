@@ -76,6 +76,11 @@ class CustomisableProduct_Controller extends Product_Controller
                                 ->first();
                         }
 
+                        // Deal with checkbox set fields to ensure data is a string
+                        if (is_array($value)) {
+                            $value = implode(",", $value);
+                        }
+
                         $customisations[] = array(
                             "Title" => $custom_item->Title,
                             "Value" => $value,
