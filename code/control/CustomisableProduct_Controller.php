@@ -68,27 +68,35 @@ class CustomisableProduct_Controller extends Product_Controller
                     if ($custom_item = ProductCustomisation::get()->byID($custom_data[1])) {
                         $modify_price = 0;
 
-                        // Check if the current selected option has a price modification
-                        if ($custom_item->Options()->exists()) {
-                            $option = $custom_item
-                                ->Options()
-                                ->filter("Title", $value)
-                                ->first();
-                        }
-
-                        // Modify price if applicable
-                        if ($option) {
-                            $modify_price = $option->ModifyPrice;
-                        }
-
                         // Deal with checkbox set fields to ensure data is a string
                         if (is_array($value)) {
-                            $value = implode(",", $value);
+                            $custom_value = implode(",", $value);
+                        } else {
+                            $custom_value = $value;
+                        }
+
+                        // Check if the current selected option has a price modification
+                        if ($custom_item->Options()->exists()) {
+                            $options = $custom_item
+                                ->Options()
+                                ->filter("Title", $value);
+
+                            // If dealing with multiple results collect them, or return a single value
+                            if ($options->exists() && $options->count() > 1) {
+                                $custom_value = "";
+                                foreach ($options as $option) {
+                                    $modify_price = $modify_price + $option->ModifyPrice;
+                                    $custom_value .= $option->Title;
+                                }
+                            } elseif ($options->exists()) {
+                                $option = $options->first();
+                                $modify_price = $option->ModifyPrice;
+                            }
                         }
 
                         $customisations[] = array(
                             "Title" => $custom_item->Title,
-                            "Value" => $value,
+                            "Value" => $custom_value,
                             "Price" => $modify_price
                         );
                     }
