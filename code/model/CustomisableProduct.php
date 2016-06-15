@@ -72,4 +72,13 @@ class CustomisableProduct extends Product
 
         return $fields;
     }
+
+    public function onBeforeDelete() {
+        parent::onBeforeDelete();
+
+        // Clean up customisations
+        foreach ($this->Customisations() as $customisation) {
+            $customisation->delete();
+        }
+    }
 }
