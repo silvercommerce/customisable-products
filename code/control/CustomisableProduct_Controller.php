@@ -76,6 +76,11 @@ class CustomisableProduct_Controller extends Product_Controller
                                 ->first();
                         }
 
+                        // Modify price if applicable
+                        if ($option) {
+                            $modify_price = $option->ModifyPrice;
+                        }
+
                         // Deal with checkbox set fields to ensure data is a string
                         if (is_array($value)) {
                             $value = implode(",", $value);
@@ -84,7 +89,7 @@ class CustomisableProduct_Controller extends Product_Controller
                         $customisations[] = array(
                             "Title" => $custom_item->Title,
                             "Value" => $value,
-                            "Price" => $option->ModifyPrice
+                            "Price" => $modify_price
                         );
                     }
                 }
