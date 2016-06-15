@@ -60,7 +60,9 @@ class ProductCustomisationOption extends DataObject
         $price->setValue($modify_price);
 
         if ($price->RAW() > 0) {
-            $summary = $this->Title . ' (' . $price->nice() . ')';
+            $summary = $this->Title . ' +' . $price->nice();
+        } elseif ($price->RAW() < 0) {
+            $summary = $this->Title . ' -' . str_replace(array("(",")"), "", $price->nice());
         } else {
             $summary = $this->Title;
         }
