@@ -8,8 +8,12 @@ class CustomisableProduct extends Product
      */
     private static $description = "A product that can be modified by the customer";
 
+    private static $has_one = array(
+        "CustomisationList" => "ProductCustomisationList"
+    );
+
     private static $has_many = array(
-        "Customisations"=> "ProductCustomisation"
+        "Customisations" => "ProductCustomisation"
     );
 
     public function getCMSFields()
@@ -29,7 +33,10 @@ class CustomisableProduct extends Product
 
         // Deal with customisations
         $add_button = new GridFieldAddNewButton('toolbar-header-left');
-        $add_button->setButtonName('Add Customisation');
+        $add_button->setButtonName(_t(
+            "CustomisableProduct.AddCustomisation",
+            "Add Customisation"
+        ));
 
         $custom_config = GridFieldConfig::create()->addComponents(
             new GridFieldToolbarHeader(),
@@ -43,9 +50,25 @@ class CustomisableProduct extends Product
             new GridFieldOrderableRows('Sort')
         );
 
-        $custom_field = GridField::create('Customisations', '', $this->Customisations(), $custom_config);
-
-        $fields->addFieldToTab('Root.Customisations', $custom_field);
+        $fields->addFieldsToTab(
+            'Root.Customisations',
+            array(
+                DropdownField::create(
+                    "CustomisationListID",
+                    _t("CustomisableProduct.UseCustomisationList", "Use a Customisation List"),
+                    ProductCustomisationList::get()->map()
+                )->setEmptyString(_t(
+                    "CustomisableProduct.SelectList",
+                    "Select List"
+                )),
+                GridField::create(
+                    'Customisations',
+                    '',
+                    $this->Customisations(),
+                    $custom_config
+                )
+            )
+        );
 
         return $fields;
     }

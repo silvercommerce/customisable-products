@@ -1,0 +1,6 @@
+---
+Name: customisableproductconfig
+---
+SiteConfig:
+  extensions:
+    - CustomisableProductSiteConfig

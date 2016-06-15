@@ -10,15 +10,34 @@ class CustomisableProduct_Controller extends Product_Controller
     public function Form()
     {
         $form = parent::Form();
-        $object = $this->owner->dataRecord;
+        $object = $this->dataRecord;
 
         $requirements = new RequiredFields(array("Quantity"));
+
+        // First add customisations from global lists
+        if ($object->CustomisationListID) {
+            foreach ($object->CustomisationList()->Customisations() as $customisation) {
+                $field = $customisation->Field();
+                $form
+                    ->Fields()
+                    ->insertBefore($field, "Quantity");
+
+                // Check if field required
+                if ($customisation->Required) {
+                    $form
+                        ->getValidator()
+                        ->addRequiredField($field->getName());
+                }
+            }
+        }
 
         // If product colour customisations are set, add them to the item form
         if ($object->Customisations()->exists()) {
             foreach ($object->Customisations() as $customisation) {
                 $field = $customisation->Field();
-                $form->Fields()->insertBefore($field, "Quantity");
+                $form
+                    ->Fields()
+                    ->insertBefore($field, "Quantity");
 
                 // Check if field required
                 if ($customisation->Required) {
@@ -85,20 +104,34 @@ class CustomisableProduct_Controller extends Product_Controller
                 "ClassName" => $object->ClassName
             );
 
-            $cart->add($item_to_add, $data['Quantity']);
-            $cart->save();
+            // Try and add item to cart, return any exceptions raised
+            // as a message
+            try {
+                $cart->add($item_to_add, $data['Quantity']);
+                $cart->save();
+                
+                $message = _t('Commerce.AddedItemToCart', 'Added item to your shopping cart');
+                $message .= ' <a href="'. $cart->Link() .'">';
+                $message .= _t('Commerce.ViewCartNow', 'View cart now');
+                $message .= '</a>';
 
-            $message = _t('Checkout.AddedItemToCart', 'Added item to your shopping cart');
-            $message .= ' <a href="'. $cart->Link() .'">';
-            $message .= _t('Checkout.ViewCart', 'View cart');
-            $message .= '</a>';
-
-            $this->setSessionMessage(
-                "success",
-                $message
-            );
+                $this->setSessionMessage(
+                    "success",
+                    $message
+                );
+            } catch(ValidationException $e) {
+                $this->setSessionMessage(
+                    "bad",
+                    $e->getMessage()
+                );
+            } catch(Exception $e) {
+                $this->setSessionMessage(
+                    "bad",
+                    $e->getMessage()
+                );
+            }
         } else {
-            $this->owner->setSessionMessage(
+            $this->setSessionMessage(
                 "bad",
                 _t("Checkout.ThereWasAnError", "There was an error")
             );
