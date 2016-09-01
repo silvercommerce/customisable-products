@@ -24,6 +24,11 @@ class CustomisableProduct_Controller extends Product_Controller
 
                 // Check if field required
                 if ($customisation->Required) {
+                    // Manualy make field required (as SS seems to ignore this step)
+                    $field
+                        ->setAttribute("required", true)
+                        ->addExtraClass("required");
+
                     $form
                         ->getValidator()
                         ->addRequiredField($field->getName());
@@ -41,6 +46,11 @@ class CustomisableProduct_Controller extends Product_Controller
 
                 // Check if field required
                 if ($customisation->Required) {
+                    // Manualy make field required (as SS seems to ignore this step)
+                    $field
+                        ->setAttribute("required", true)
+                        ->addExtraClass("required");
+
                     $form
                         ->getValidator()
                         ->addRequiredField($field->getName());
