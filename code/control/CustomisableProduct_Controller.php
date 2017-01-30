@@ -129,7 +129,8 @@ class CustomisableProduct_Controller extends Product_Controller
                 "Image" => $object->Images()->first(),
                 "StockID" => $object->StockID,
                 "ID" => $object->ID,
-                "ClassName" => $object->ClassName
+                "ClassName" => $object->ClassName,
+                "Stocked" => $object->Stocked
             );
 
             // Try and add item to cart, return any exceptions raised
