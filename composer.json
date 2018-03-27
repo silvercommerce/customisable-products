@@ -1,24 +1,34 @@
 {
-  "name": "i-lateral/silverstripe-commerce-customisableproduct",
-  "description": "Silverstripe module that adds customisable products (adding dropdowns, radio buttons or textfields to a product)",
-  "type": "silverstripe-module",
-    "homepage": "http://github.com/i-lateral/silverstripe-commerce-customisableproduct",
-    "keywords": ["silverstripe","commerce","product","customisable"],
+  "name": "silvercommerce/customisable-products",
+  "description": "SilverCommerce module that adds customisable products (adding dropdowns, radio buttons or textfields to a product)",
+  "type": "silverstripe-vendormodule",
+    "homepage": "https://github.com/silvercommerce/customisable-products",
+    "keywords": [
+        "silverstripe",
+        "silvercommerce",
+        "commerce",
+        "product",
+        "customisable"
+    ],
     "license": "BSD-3-Clause",
     "authors": [
         {
-            "name": "i-lateral",
-            "email": "info@i-lateral.com"
+            "name": "Mo",
+            "email": "morven@ilateral.co.uk"
         }
     ],
     "support": {
-        "issues": "http://github.com/i-lateral/silverstripe-commerce-customisableproduct/issues"
+        "issues": "https://github.com/silvercommerce/customisable-products/issues"
     },
     "require": {
-        "silverstripe/framework": ">=3.1",
-        "i-lateral/silverstripe-commerce": "3.*@dev"
+        "silvercommerce/catalogue-admin": "1.*@dev"
     },
-    "extra": {
-        "installer-name": "commerce-customisableproduct"
+    "autoload": {
+        "psr-4": {
+            "SilverCommerce\\CustomisableProducts\\": "src/"
+        }
+    },
+    "suggest": {
+        "silvercommerce/catalogue-frontend": "Render your product catalogue into the frontend of the site"
     }
 }
