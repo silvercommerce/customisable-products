@@ -1,34 +1,31 @@
-Silverstripe Commerce Customisable Product
-==========================================
+SilverCommerce Customisable Products
+====================================
 
-Extension to silverstripe commerce module that allows you to add
-customisable product's to your catalogue.
+Adds a product that can be customised (via dropdowns, radios or free-text)
+to your product catalogue.
 
-Customisable products have customisation options such as dropdowns,
-textboxes and radiobuttons. 
+**NOTE** By default this module does not require you to install a catalogue
+frontend, but it does support the two default ones that can be used with 
+SilverCommerce (`silvercommerce/catalogue-frontent` and `silvercommerce/catalogue-page`). 
 
 
 ## Author
 
-This module is created and maintained by
-[ilateral](http://www.i-lateral.com)
-
-Contact: morven@i-lateral.com
+This module is created and maintained by:
+[ilateral](https://ilateralweb.co.uk)
 
 ## Dependancies
 
-* SilverStripe Framework 3.1.x
-* Silverstripe Commerce
+* SilverStripe Framework 4.x
+* SilverCommerce CatalogueAdmin 1.x
 
 ## Installation
 
-Install this module either by downloading and adding to:
+Install this module via composer:
 
-[silverstripe-root]/commerce-customisableproduct
+    composer reqire silvercommerce/customisable-products
 
-Then run: dev/build/?flush=all
-
-Or alternativly add to your project's composer.json
+Then run: dev/build/?flush=1
 
 ## Usage
 

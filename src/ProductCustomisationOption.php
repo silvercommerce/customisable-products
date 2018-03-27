@@ -1,36 +1,44 @@
 <?php
 
+namespace SilverCommerce\CustomisableProducts;
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBCurrency;
+use SilverStripe\SiteConfig\SiteConfig;
+
 class ProductCustomisationOption extends DataObject
 {
-    private static $db = array(
+    private static $db = [
         'Title'         => 'Varchar',
         'ModifyPrice'   => 'Decimal',
         'Sort'          => 'Int',
         'Default'       => 'Boolean'
-    );
+    ];
 
-    private static $has_one = array(
-        "Parent"        => 'ProductCustomisation'
-    );
+    private static $has_one = [
+        "Parent"        => ProductCustomisation::class
+    ];
 
-    private static $casting = array(
+    private static $casting = [
         'ItemSummary'   => 'Varchar'
-    );
+    ];
 
-    private static $summary_fields = array(
+    private static $summary_fields = [
         'Title',
         'ModifyPrice',
         'Default'
-    );
+    ];
 
-    private static $field_types = array(
+    private static $field_types = [
         'Title'         => 'TextField',
         'Sort'          => 'Int',
         'ModifyPrice'   => 'TextField',
         'Default'       => 'CheckboxField'
-    );
+    ];
 
-    private static $default_sort = "\"Sort\" ASC";
+    private static $default_sort = [
+        'Sort' => 'ASC'
+    ];
 
     /**
      * Use this method to get a full list of field types
@@ -50,19 +58,20 @@ class ProductCustomisationOption extends DataObject
     public function getItemSummary()
     {
         $modify_price = $this->ModifyPrice;
-        $price = new Currency();
-        $tax_id = $this->Parent()->Parent()->TaxRateID;
+        $config = SiteConfig::current_site_config();
+        $price = new DBCurrency();
+        $tax = $this->Parent()->Parent()->getTaxFromCategory();
 
-        if ($tax_id && Catalogue::config()->price_includes_tax) {
-            $modify_price += ($modify_price / 100) * $this->Parent()->Parent()->TaxRate()->Amount;
+        if (isset($tax) && $config->ShowPriceAndTax) {
+            $modify_price += ($modify_price / 100) * $tax->Rate;
         }
 
         $price->setValue($modify_price);
 
         if ($price->RAW() > 0) {
-            $summary = $this->Title . ' +' . $price->nice();
+            $summary = $this->Title . ' +' . $price->Nice();
         } elseif ($price->RAW() < 0) {
-            $summary = $this->Title . ' -' . str_replace(array("(",")"), "", $price->nice());
+            $summary = $this->Title . ' -' . str_replace(array("(",")"), "", $price->Nice());
         } else {
             $summary = $this->Title;
         }

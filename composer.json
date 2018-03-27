@@ -21,7 +21,8 @@
         "issues": "https://github.com/silvercommerce/customisable-products/issues"
     },
     "require": {
-        "silvercommerce/catalogue-admin": "1.*@dev"
+        "silvercommerce/catalogue-admin": "1.*@dev",
+        "silvercommerce/shoppingcart": "1.*@dev"
     },
     "autoload": {
         "psr-4": {

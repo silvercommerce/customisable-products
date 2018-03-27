@@ -1,22 +1,34 @@
 <?php
 
-class CustomisableProduct_Controller extends Product_Controller
+namespace SilverCommerce\CustomisableProducts;
+
+use Exception;
+use SilverStripe\ORM\ValidationResult;
+use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
+use SilverCommerce\ShoppingCart\Control\ShoppingCart;
+
+class CustomisableProductController extends ProductController
 {
+    private static $allowed_actions = [
+        "AddToCartForm"
+    ];
 
-    public static $allowed_actions = array(
-        'Form'
-    );
-
-    public function Form()
+    public function AddToCartForm()
     {
-        $form = parent::Form();
+        $form = AddToCartForm::create(
+            $this->owner,
+            "AddToCartForm"
+        );
         $object = $this->dataRecord;
+        $list = $object->CustomisationList();
 
-        $requirements = new RequiredFields(array("Quantity"));
+        $form
+            ->setProductClass($object->ClassName)
+            ->setProductID($object->ID);
 
         // First add customisations from global lists
-        if ($object->CustomisationListID) {
-            foreach ($object->CustomisationList()->Customisations() as $customisation) {
+        if ($list->exists()) {
+            foreach ($list->Customisations() as $customisation) {
                 $field = $customisation->Field();
                 $form
                     ->Fields()
@@ -65,11 +77,17 @@ class CustomisableProduct_Controller extends Product_Controller
     {
         $classname = $data["ClassName"];
         $id = $data["ID"];
-        $customisations = array();
+        $object = $classname::get()->byID($id);
         $cart = ShoppingCart::get();
+        $cart->config()->item_class;
+        $customisations = array();
 
-        if ($object = $classname::get()->byID($id)) {
-            $price = $object->Price;
+        if (!empty($object)) {
+            if (method_exists($object, "getTaxFromCategory")) {
+                $tax_rate = $object->getTaxFromCategory();
+            } else {
+                $tax_rate = null;
+            }
         
             foreach ($data as $key => $value) {
                 if (!(strpos($key, 'customise') === false) && $value) {
@@ -113,56 +131,46 @@ class CustomisableProduct_Controller extends Product_Controller
                 }
             }
 
-            if ($object->TaxRateID && $object->TaxRate()->Amount) {
-                $tax_rate = $object->TaxRate()->Amount;
-            } else {
-                $tax_rate = 0;
-            }
+            $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
 
-            $item_to_add = array(
-                "Key" => (int)$data['ID'] . ':' . base64_encode(json_encode($customisations)),
+            $item_to_add = $item_class::create([
                 "Title" => $object->Title,
                 "Content" => $object->Content,
-                "BasePrice" => $price,
-                "TaxRate" => $tax_rate,
-                "CustomisationArray" => $customisations,
-                "Image" => $object->Images()->first(),
+                "Price" => $object->Price,
+                "Quantity" => $data['Quantity'],
                 "StockID" => $object->StockID,
-                "ID" => $object->ID,
-                "ClassName" => $object->ClassName,
-                "Stocked" => $object->Stocked
-            );
+                "Weight" => $object->Weight,
+                "ProductClass" => $object->ClassName,
+                "Stocked" => $object->Stocked,
+                "Deliverable" => $deliverable,
+                "TaxRateID" => $tax_rate,
+                "CustomisationArray" => $customisations,
+            ]);
 
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->add($item_to_add, $data['Quantity']);
+                $cart->add($item_to_add);
                 $cart->save();
-                
-                $message = _t('Commerce.AddedItemToCart', 'Added item to your shopping cart');
-                $message .= ' <a href="'. $cart->Link() .'">';
-                $message .= _t('Commerce.ViewCartNow', 'View cart now');
-                $message .= '</a>';
 
-                $this->setSessionMessage(
-                    "success",
-                    $message
+                $message = _t(
+                    'ShoppingCart.AddedItemToCart',
+                    'Added "{item}" to your shopping cart',
+                    ["item" => $object->Title]
                 );
-            } catch(ValidationException $e) {
-                $this->setSessionMessage(
-                    "bad",
-                    $e->getMessage()
+
+                $form->sessionMessage(
+                    $message,
+                    ValidationResult::TYPE_GOOD
                 );
             } catch(Exception $e) {
-                $this->setSessionMessage(
-                    "bad",
+                $form->sessionMessage(
                     $e->getMessage()
                 );
             }
         } else {
-            $this->setSessionMessage(
-                "bad",
-                _t("Checkout.ThereWasAnError", "There was an error")
+            $form->sessionMessage(
+                _t("ShoppingCart.ErrorAddingToCart", "Error adding item to cart")
             );
         }
 

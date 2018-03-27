@@ -1,6 +1,6 @@
 ---
 Name: customisableproductconfig
 ---
-SiteConfig:
+use SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - CustomisableProductSiteConfig
+    - SilverCommerce\CustomisableProducts\SiteConfigExtension
