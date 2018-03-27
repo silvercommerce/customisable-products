@@ -8,6 +8,14 @@ use SilverStripe\SiteConfig\SiteConfig;
 
 class ProductCustomisationOption extends DataObject
 {
+    /**
+     * Table to create in DB
+     * 
+     * @var string
+     * @config
+     */
+    private static $table_name = "ProductCustomisationOption";
+
     private static $db = [
         'Title'         => 'Varchar',
         'ModifyPrice'   => 'Decimal',

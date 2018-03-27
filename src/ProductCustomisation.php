@@ -49,6 +49,13 @@ class ProductCustomisation extends DataObject
      */
     const TEXT_FIELD = 'TextEntry';
 
+    /**
+     * Table to create in DB
+     * 
+     * @var string
+     * @config
+     */
+    private static $table_name = "ProductCustomisation";
 
     private static $db = [
         'Title'     => 'Varchar',

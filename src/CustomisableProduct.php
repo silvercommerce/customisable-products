@@ -19,6 +19,14 @@ use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 class CustomisableProduct extends Product
 {
     /**
+     * Table to create in DB
+     * 
+     * @var string
+     * @config
+     */
+    private static $table_name = "CustomisableProduct";
+
+    /**
      * @config
      */
     private static $description = "A product that can be modified by the customer";

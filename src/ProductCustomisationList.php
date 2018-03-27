@@ -7,6 +7,14 @@ use SilverStripe\SiteConfig\SiteConfig;
 
 class ProductCustomisationList extends DataObject
 {
+    /**
+     * Table to create in DB
+     * 
+     * @var string
+     * @config
+     */
+    private static $table_name = "ProductCustomisationList";
+
     private static $db = [
         "Title" => "Varchar"
     ];
