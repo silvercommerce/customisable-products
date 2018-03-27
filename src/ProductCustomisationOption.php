@@ -86,7 +86,7 @@ class ProductCustomisationOption extends DataObject
         return $this->Parent()->canView($member);
     }
 
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return $this->Parent()->canCreate($member);
     }
