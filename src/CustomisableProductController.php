@@ -3,6 +3,7 @@
 namespace SilverCommerce\CustomisableProducts;
 
 use Exception;
+use ProductController;
 use SilverStripe\ORM\ValidationResult;
 use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
 use SilverCommerce\ShoppingCart\Control\ShoppingCart;

@@ -2,6 +2,7 @@
 
 namespace SilverCommerce\CustomisableProducts;
 
+use Product;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;

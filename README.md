@@ -23,7 +23,7 @@ This module is created and maintained by:
 
 Install this module via composer:
 
-    composer reqire silvercommerce/customisable-products
+    composer require silvercommerce/customisable-products
 
 Then run: dev/build/?flush=1
 
