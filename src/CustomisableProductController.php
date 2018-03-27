@@ -80,7 +80,7 @@ class CustomisableProductController extends ProductController
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
         $cart = ShoppingCart::get();
-        $cart->config()->item_class;
+        $item_class = $cart->config()->item_class;
         $customisations = array();
 
         if (!empty($object)) {
