@@ -81,6 +81,7 @@ class CustomisableProductController extends ProductController
         $object = $classname::get()->byID($id);
         $cart = ShoppingCart::get();
         $item_class = $cart->config()->item_class;
+        $item_customisation_class = $cart->config()->item_customisation_class;
         $customisations = array();
 
         if (!empty($object)) {
@@ -123,11 +124,11 @@ class CustomisableProductController extends ProductController
                             }
                         }
 
-                        $customisations[] = array(
+                        $customisations[] = $item_customisation_class::create([
                             "Title" => $custom_item->Title,
                             "Value" => $custom_value,
                             "Price" => $modify_price
-                        );
+                        ]);
                     }
                 }
             }
@@ -144,14 +145,13 @@ class CustomisableProductController extends ProductController
                 "ProductClass" => $object->ClassName,
                 "Stocked" => $object->Stocked,
                 "Deliverable" => $deliverable,
-                "TaxRateID" => $tax_rate,
-                "CustomisationArray" => $customisations,
+                "TaxRateID" => $tax_rate
             ]);
 
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->add($item_to_add);
+                $cart->add($item_to_add, $customisations);
                 $cart->save();
 
                 $message = _t(
