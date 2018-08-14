@@ -7,6 +7,8 @@ use ProductController;
 use SilverStripe\ORM\ValidationResult;
 use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
+use SilverCommerce\OrdersAdmin\Model\LineItem;
+use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 
 class CustomisableProductController extends ProductController
 {
@@ -79,9 +81,9 @@ class CustomisableProductController extends ProductController
         $classname = $data["ClassName"];
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
-        $cart = ShoppingCartFactory::create()->getCurrent();
-        $item_class = $cart->config()->item_class;
-        $item_customisation_class = $cart->config()->item_customisation_class;
+        $cart = ShoppingCartFactory::create();
+        $item_class = LineItem::class;
+        $item_customisation_class = LineItemCustomisation::class;
         $customisations = array();
 
         if (!empty($object)) {
@@ -151,7 +153,7 @@ class CustomisableProductController extends ProductController
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->add($item_to_add, $customisations);
+                $cart->addItem($item_to_add, $customisations);
                 $cart->save();
 
                 $message = _t(
