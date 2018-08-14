@@ -6,7 +6,7 @@ use Exception;
 use ProductController;
 use SilverStripe\ORM\ValidationResult;
 use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
-use SilverCommerce\ShoppingCart\Control\ShoppingCart;
+use SilverCommerce\ShoppingCart\ShoppingCartFactory;
 
 class CustomisableProductController extends ProductController
 {
@@ -79,7 +79,7 @@ class CustomisableProductController extends ProductController
         $classname = $data["ClassName"];
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
-        $cart = ShoppingCart::get();
+        $cart = ShoppingCartFactory::create()->getCurrent();
         $item_class = $cart->config()->item_class;
         $item_customisation_class = $cart->config()->item_customisation_class;
         $customisations = array();
