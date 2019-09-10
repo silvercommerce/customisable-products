@@ -52,7 +52,7 @@ class ProductCustomisation extends DataObject
     /**
      * Table to create in DB
      * 
-     * @var string
+     * @var    string
      * @config
      */
     private static $table_name = "ProductCustomisation";
@@ -85,44 +85,46 @@ class ProductCustomisation extends DataObject
 
     public function getCMSFields()
     {
-        $this->beforeUpdateCMSFields(function ($fields) {
-            $fields->removeByName('Options');
-            $fields->removeByName('ParentID');
-            $fields->removeByName('Sort');
-            $fields->removeByName('MaxLength');
+        $this->beforeUpdateCMSFields(
+            function ($fields) {
+                $fields->removeByName('Options');
+                $fields->removeByName('ParentID');
+                $fields->removeByName('Sort');
+                $fields->removeByName('MaxLength');
 
-            if ($this->ID && $this->DisplayAs != self::TEXT_FIELD) {
-                $field_types = ProductCustomisationOption::singleton()->getFieldTypes();
+                if ($this->ID && $this->DisplayAs != self::TEXT_FIELD) {
+                    $field_types = ProductCustomisationOption::singleton()->getFieldTypes();
 
-                // Deal with product features
-                $add_button = new GridFieldAddNewInlineButton('toolbar-header-left');
-                $add_button->setTitle('Add Customisation Option');
+                    // Deal with product features
+                    $add_button = new GridFieldAddNewInlineButton('toolbar-header-left');
+                    $add_button->setTitle('Add Customisation Option');
 
-                $options_field = GridField::create(
-                    'Options',
-                    '',
-                    $this->Options(),
-                    GridFieldConfig::create()
-                        ->addComponent(new GridFieldButtonRow('before'))
-                        ->addComponent(new GridFieldToolbarHeader())
-                        ->addComponent(new GridFieldTitleHeader())
-                        ->addComponent(new GridFieldEditableColumns())
-                        ->addComponent(new GridFieldDeleteAction())
-                        ->addComponent($add_button)
-                        ->addComponent(new GridFieldOrderableRows('Sort'))
-                );
+                    $options_field = GridField::create(
+                        'Options',
+                        '',
+                        $this->Options(),
+                        GridFieldConfig::create()
+                            ->addComponent(new GridFieldButtonRow('before'))
+                            ->addComponent(new GridFieldToolbarHeader())
+                            ->addComponent(new GridFieldTitleHeader())
+                            ->addComponent(new GridFieldEditableColumns())
+                            ->addComponent(new GridFieldDeleteAction())
+                            ->addComponent($add_button)
+                            ->addComponent(new GridFieldOrderableRows('Sort'))
+                    );
 
-                $fields->addFieldToTab('Root.Main', $options_field);
+                    $fields->addFieldToTab('Root.Main', $options_field);
+                }
+
+                if ($this->ID && $this->DisplayAs == self::TEXT_FIELD) {
+                    $fields->addFieldToTab("Root.Main", TextField::create("MaxLength"));
+                }
+
+                if (!$this->ID) {
+                    $fields->addFieldToTab('Root.Main', LiteralField::create('CreateWarning', '<p>You need to create this before you can add options</p>'));
+                }
             }
-
-            if ($this->ID && $this->DisplayAs == self::TEXT_FIELD) {
-                $fields->addFieldToTab("Root.Main", TextField::create("MaxLength"));
-            }
-
-            if (!$this->ID) {
-                $fields->addFieldToTab('Root.Main', LiteralField::create('CreateWarning', '<p>You need to create this before you can add options</p>'));
-            }
-        });
+        );
 
         return parent::getCMSFields();
     }
@@ -156,39 +158,41 @@ class ProductCustomisation extends DataObject
             $default = ($defaults->exists()) ? $defaults->first()->Title : null;
 
             switch ($this->DisplayAs) {
-                case self::DROPDOWN_FIELD:
-                    $field = DropdownField::create(
-                        $name,
-                        $title,
-                        $options,
-                        $default
-                    )->setEmptyString(_t(
+            case self::DROPDOWN_FIELD:
+                $field = DropdownField::create(
+                    $name,
+                    $title,
+                    $options,
+                    $default
+                )->setEmptyString(
+                    _t(
                         'CustomisableProducts.PleaseSelect',
                         'Please Select'
-                    ));
-                    break;
-                case self::RADIO_FIELD:
-                    $field = OptionsetField::create(
-                        $name,
-                        $title,
-                        $options,
-                        $default
-                    );
-                    break;
-                case self::CHECKBOX_FIELD:
-                    $field = CheckboxSetField::create(
-                        $name,
-                        $title,
-                        $options,
-                        $defaults->column('ID')
-                    );
-                    break;
-                case self::TEXT_FIELD:
-                    $field = TextField::create($name, $title);
-                    if ($this->MaxLength) {
-                        $field->setMaxLength($this->MaxLength);
-                    }
-                    break;
+                    )
+                );
+                break;
+            case self::RADIO_FIELD:
+                $field = OptionsetField::create(
+                    $name,
+                    $title,
+                    $options,
+                    $default
+                );
+                break;
+            case self::CHECKBOX_FIELD:
+                $field = CheckboxSetField::create(
+                    $name,
+                    $title,
+                    $options,
+                    $defaults->column('ID')
+                );
+                break;
+            case self::TEXT_FIELD:
+                $field = TextField::create($name, $title);
+                if ($this->MaxLength) {
+                    $field->setMaxLength($this->MaxLength);
+                }
+                break;
             }
 
             $this->extend('updateField', $field);

@@ -10,7 +10,7 @@ class ProductCustomisationList extends DataObject
     /**
      * Table to create in DB
      * 
-     * @var string
+     * @var    string
      * @config
      */
     private static $table_name = "ProductCustomisationList";
@@ -27,7 +27,8 @@ class ProductCustomisationList extends DataObject
         "Customisations" => ProductCustomisation::class
     ];
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         parent::onBeforeDelete();
 
         // Clean up customisations

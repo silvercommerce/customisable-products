@@ -7,8 +7,6 @@ use ProductController;
 use SilverStripe\ORM\ValidationResult;
 use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
-use SilverCommerce\OrdersAdmin\Model\LineItem;
-use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 
 class CustomisableProductController extends ProductController
 {
@@ -82,17 +80,9 @@ class CustomisableProductController extends ProductController
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
         $cart = ShoppingCartFactory::create();
-        $item_class = LineItem::class;
-        $item_customisation_class = LineItemCustomisation::class;
-        $customisations = array();
+        $customisations = [];
 
         if (!empty($object)) {
-            if (method_exists($object, "getTaxFromCategory")) {
-                $tax_rate = $object->getTaxFromCategory();
-            } else {
-                $tax_rate = null;
-            }
-        
             foreach ($data as $key => $value) {
                 if (!(strpos($key, 'customise') === false) && $value) {
                     $custom_data = explode("_", $key);
@@ -107,13 +97,14 @@ class CustomisableProductController extends ProductController
                             $custom_value = $value;
                         }
 
-                        // Check if the current selected option has a price modification
+                        // Check if the current option has a price modification
                         if ($custom_item->Options()->exists()) {
                             $options = $custom_item
                                 ->Options()
                                 ->filter("Title", $value);
 
-                            // If dealing with multiple results collect them, or return a single value
+                            // If dealing with multiple results collect them
+                            // or return a single value
                             if ($options->exists() && $options->count() > 1) {
                                 $custom_value = "";
                                 foreach ($options as $option) {
@@ -126,34 +117,20 @@ class CustomisableProductController extends ProductController
                             }
                         }
 
-                        $customisations[] = $item_customisation_class::create([
+                        $customisations[] = [
                             "Title" => $custom_item->Title,
                             "Value" => $custom_value,
-                            "Price" => $modify_price
-                        ]);
+                            "BasePrice" => $modify_price
+                        ];
                     }
                 }
             }
-
-            $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
-
-            $item_to_add = $item_class::create([
-                "Title" => $object->Title,
-                "Content" => $object->Content,
-                "Price" => $object->Price,
-                "Quantity" => $data['Quantity'],
-                "StockID" => $object->StockID,
-                "Weight" => $object->Weight,
-                "ProductClass" => $object->ClassName,
-                "Stocked" => $object->Stocked,
-                "Deliverable" => $deliverable,
-                "TaxRateID" => $tax_rate
-            ]);
+            
 
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->addItem($item_to_add, $customisations);
+                $cart->addItem($object, $data['Quantity'], false, $customisations);
                 $cart->save();
 
                 $message = _t(
