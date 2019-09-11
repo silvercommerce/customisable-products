@@ -11,7 +11,7 @@ class ProductCustomisationOption extends DataObject
     /**
      * Table to create in DB
      * 
-     * @var string
+     * @var    string
      * @config
      */
     private static $table_name = "ProductCustomisationOption";

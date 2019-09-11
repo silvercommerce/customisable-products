@@ -126,18 +126,21 @@ class CustomisableProductController extends ProductController
                             }
                         }
 
-                        $customisations[] = $item_customisation_class::create([
+                        $customisations[] = $item_customisation_class::create(
+                            [
                             "Title" => $custom_item->Title,
                             "Value" => $custom_value,
                             "Price" => $modify_price
-                        ]);
+                            ]
+                        );
                     }
                 }
             }
 
             $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
 
-            $item_to_add = $item_class::create([
+            $item_to_add = $item_class::create(
+                [
                 "Title" => $object->Title,
                 "Content" => $object->Content,
                 "Price" => $object->Price,
@@ -148,7 +151,8 @@ class CustomisableProductController extends ProductController
                 "Stocked" => $object->Stocked,
                 "Deliverable" => $deliverable,
                 "TaxRateID" => $tax_rate
-            ]);
+                ]
+            );
 
             // Try and add item to cart, return any exceptions raised
             // as a message

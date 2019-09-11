@@ -33,7 +33,8 @@ class SiteConfigExtension extends DataExtension
         );
     }
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         parent::onBeforeDelete();
 
         // Clean up customisations

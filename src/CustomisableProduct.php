@@ -21,7 +21,7 @@ class CustomisableProduct extends Product
     /**
      * Table to create in DB
      * 
-     * @var string
+     * @var    string
      * @config
      */
     private static $table_name = "CustomisableProduct";
@@ -41,56 +41,63 @@ class CustomisableProduct extends Product
 
     public function getCMSFields()
     {
-        $this->beforeUpdateCMSFields(function ($fields) {
-            $fields->removeByName("Root.Customisations");
+        $this->beforeUpdateCMSFields(
+            function ($fields) {
+                $fields->removeByName("Root.Customisations");
 
-            // Only add fields if the object exists
-            if($this->ID) {
-                // Deal with customisations
-                $add_button = new GridFieldAddNewButton('toolbar-header-left');
-                $add_button->setButtonName(_t(
-                    "CustomisableProduct.AddCustomisation",
-                    "Add Customisation"
-                ));
+                // Only add fields if the object exists
+                if($this->ID) {
+                    // Deal with customisations
+                    $add_button = new GridFieldAddNewButton('toolbar-header-left');
+                    $add_button->setButtonName(
+                        _t(
+                            "CustomisableProduct.AddCustomisation",
+                            "Add Customisation"
+                        )
+                    );
 
-                $custom_config = GridFieldConfig::create()->addComponents(
-                    new GridFieldToolbarHeader(),
-                    $add_button,
-                    new GridFieldSortableHeader(),
-                    new GridFieldDataColumns(),
-                    new GridFieldPaginator(20),
-                    new GridFieldEditButton(),
-                    new GridFieldDeleteAction(),
-                    new GridFieldDetailForm(),
-                    new GridFieldOrderableRows('Sort')
-                );
+                    $custom_config = GridFieldConfig::create()->addComponents(
+                        new GridFieldToolbarHeader(),
+                        $add_button,
+                        new GridFieldSortableHeader(),
+                        new GridFieldDataColumns(),
+                        new GridFieldPaginator(20),
+                        new GridFieldEditButton(),
+                        new GridFieldDeleteAction(),
+                        new GridFieldDetailForm(),
+                        new GridFieldOrderableRows('Sort')
+                    );
 
-                $fields->addFieldsToTab(
-                    'Root.Customisations',
-                    array(
+                    $fields->addFieldsToTab(
+                        'Root.Customisations',
+                        array(
                         DropdownField::create(
                             "CustomisationListID",
                             _t("CustomisableProduct.UseCustomisationList", "Use a Customisation List"),
                             ProductCustomisationList::get()->map()
-                        )->setEmptyString(_t(
-                            "CustomisableProduct.SelectList",
-                            "Select List"
-                        )),
+                        )->setEmptyString(
+                            _t(
+                                "CustomisableProduct.SelectList",
+                                "Select List"
+                            )
+                        ),
                         GridField::create(
                             'Customisations',
                             '',
                             $this->Customisations(),
                             $custom_config
                         )
-                    )
-                );
+                        )
+                    );
+                }
             }
-        });
+        );
 
         return parent::getCMSFields();
     }
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         parent::onBeforeDelete();
 
         // Clean up customisations
