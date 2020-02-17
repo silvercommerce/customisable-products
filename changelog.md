@@ -8,3 +8,8 @@
 
 * Support for new line items/customisations
 * Support for `Taxable`
+
+## 1.1.1
+
+* Fixed compatability issues adding items to cart
+* Require higher version of base modules

@@ -68,7 +68,7 @@ class ProductCustomisationOption extends DataObject
         $modify_price = $this->ModifyPrice;
         $config = SiteConfig::current_site_config();
         $price = new DBCurrency();
-        $tax = $this->Parent()->Parent()->getTaxFromCategory();
+        $tax = $this->Parent()->Parent()->getTaxRate();
 
         if (isset($tax) && $config->ShowPriceAndTax) {
             $modify_price += ($modify_price / 100) * $tax->Rate;

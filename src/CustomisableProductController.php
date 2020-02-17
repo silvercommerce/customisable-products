@@ -82,17 +82,9 @@ class CustomisableProductController extends ProductController
         $id = $data["ID"];
         $object = $classname::get()->byID($id);
         $cart = ShoppingCartFactory::create();
-        $item_class = LineItem::class;
-        $item_customisation_class = LineItemCustomisation::class;
         $customisations = array();
 
         if (!empty($object)) {
-            if (method_exists($object, "getTaxFromCategory")) {
-                $tax_rate = $object->getTaxFromCategory();
-            } else {
-                $tax_rate = null;
-            }
-        
             foreach ($data as $key => $value) {
                 if (!(strpos($key, 'customise') === false) && $value) {
                     $custom_data = explode("_", $key);
@@ -126,39 +118,22 @@ class CustomisableProductController extends ProductController
                             }
                         }
 
-                        $customisations[] = $item_customisation_class::create(
-                            [
+                        $customisations[] = [
                             "Title" => $custom_item->Title,
                             "Value" => $custom_value,
-                            "Price" => $modify_price
-                            ]
-                        );
+                            "BasePrice" => $modify_price
+                        ];
                     }
                 }
             }
 
-            $deliverable = (isset($object->Deliverable)) ? $object->Deliverable : true;
-
-            $item_to_add = $item_class::create(
-                [
-                "Title" => $object->Title,
-                "Content" => $object->Content,
-                "Price" => $object->Price,
-                "Quantity" => $data['Quantity'],
-                "StockID" => $object->StockID,
-                "Weight" => $object->Weight,
-                "ProductClass" => $object->ClassName,
-                "Stocked" => $object->Stocked,
-                "Deliverable" => $deliverable,
-                "TaxRateID" => $tax_rate
-                ]
-            );
+            $lock = (isset($object->Locked)) ? $object->Locked : false;
 
             // Try and add item to cart, return any exceptions raised
             // as a message
             try {
-                $cart->addItem($item_to_add, $customisations);
-                $cart->save();
+                $cart->addItem($object, $data['Quantity'], $lock, $customisations);
+                $cart->write();
 
                 $message = _t(
                     'ShoppingCart.AddedItemToCart',
@@ -170,7 +145,7 @@ class CustomisableProductController extends ProductController
                     $message,
                     ValidationResult::TYPE_GOOD
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $form->sessionMessage(
                     $e->getMessage()
                 );
