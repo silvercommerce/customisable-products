@@ -5,10 +5,7 @@ namespace SilverCommerce\CustomisableProducts;
 use Exception;
 use ProductController;
 use SilverStripe\ORM\ValidationResult;
-use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
-use SilverCommerce\OrdersAdmin\Model\LineItem;
-use SilverCommerce\OrdersAdmin\Model\LineItemCustomisation;
 
 class CustomisableProductController extends ProductController
 {
@@ -16,12 +13,14 @@ class CustomisableProductController extends ProductController
         "AddToCartForm"
     ];
 
+    /**
+     * Overwrite the default AddToCartForm to add customisation options
+     *
+     * @return Form
+     */
     public function AddToCartForm()
     {
-        $form = AddToCartForm::create(
-            $this->owner,
-            "AddToCartForm"
-        );
+        $form = parent::AddToCartForm();
         $object = $this->dataRecord;
         $list = $object->CustomisationList();
 
@@ -72,6 +71,8 @@ class CustomisableProductController extends ProductController
                 }
             }
         }
+
+        $this->extend('updateCustomisableAddToCartForm', $form);
 
         return $form;
     }

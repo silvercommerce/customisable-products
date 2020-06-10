@@ -13,3 +13,7 @@
 
 * Fixed compatability issues adding items to cart
 * Require higher version of base modules
+
+## 1.1.2
+
+* Make AddToCartForm overwrite parent's and add an extension hook
