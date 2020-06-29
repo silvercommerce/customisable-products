@@ -27,6 +27,20 @@ class CustomisableProduct extends Product
     private static $table_name = "CustomisableProduct";
 
     /**
+     * Human-readable singular name.
+     * @var string
+     * @config
+     */
+    private static $singular_name = 'Customisable Product';
+
+    /**
+     * Human-readable plural name
+     * @var string
+     * @config
+     */
+    private static $plural_name = 'Customisable Products';
+
+    /**
      * @config
      */
     private static $description = "A product that can be modified by the customer";
