@@ -8,3 +8,7 @@
 
 * Support for new line items/customisations
 * Support for `Taxable`
+
+## 1.1.3
+
+* Add singular and plural names
