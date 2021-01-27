@@ -4,6 +4,10 @@
 
 * First initial release
 
+## 1.0.1
+
+* Add legacy DB support
+
 ## 1.1.0
 
 * Support for new line items/customisations
@@ -17,3 +21,11 @@
 ## 1.1.2
 
 * Make AddToCartForm overwrite parent's and add an extension hook
+
+## 1.1.3
+
+* Add singular and plural names
+
+## 1.1.4
+
+* Add legacy DB support

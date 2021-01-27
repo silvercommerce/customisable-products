@@ -1,0 +1,9 @@
+---
+Name: customisablelegacy
+---
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    CustomisableProduct: SilverCommerce\CustomisableProducts\CustomisableProduct
+    ProductCustomisation: SilverCommerce\CustomisableProducts\ProductCustomisation
+    ProductCustomisationList: SilverCommerce\CustomisableProducts\ProductCustomisationList
+    ProductCustomisationOption: SilverCommerce\CustomisableProducts\ProductCustomisationOption
