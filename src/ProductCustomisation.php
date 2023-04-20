@@ -79,9 +79,7 @@ class ProductCustomisation extends DataObject
         'DisplayAs'
     );
 
-    private static $default_sort = [
-        'Sort' => 'ASC'
-    ];
+    private static $default_sort = 'Sort ASC';
 
     public function getCMSFields()
     {

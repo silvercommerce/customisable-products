@@ -26,3 +26,7 @@
 ## 1.1.4
 
 * Add legacy DB support
+
+## 1.1.5
+
+* Switch to string based sorting to work with GridField orderable rows

@@ -44,9 +44,7 @@ class ProductCustomisationOption extends DataObject
         'Default'       => 'CheckboxField'
     ];
 
-    private static $default_sort = [
-        'Sort' => 'ASC'
-    ];
+    private static $default_sort = 'Sort ASC';
 
     /**
      * Use this method to get a full list of field types
