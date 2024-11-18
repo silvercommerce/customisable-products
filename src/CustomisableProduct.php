@@ -3,6 +3,8 @@
 namespace SilverCommerce\CustomisableProducts;
 
 use Product;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
@@ -10,11 +12,13 @@ use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldEditButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverCommerce\OrdersAdmin\Factory\LineItemFactory;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
+use SilverCommerce\CustomisableProducts\ProductCustomisation;
 
 class CustomisableProduct extends Product
 {
