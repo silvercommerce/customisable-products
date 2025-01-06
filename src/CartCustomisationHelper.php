@@ -71,7 +71,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
                 $factory->modifyPrice(
                     $custom_item->Title,
                     (float)$option->ModifyPrice,
-                    $product
+                    $option
                 );
             }
         }
