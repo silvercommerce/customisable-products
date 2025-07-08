@@ -13,16 +13,16 @@
     "license": "BSD-3-Clause",
     "authors": [
         {
-            "name": "Mo",
-            "email": "morven@ilateral.co.uk"
+            "name": "Dean Forest Tech",
+            "homepage": "https://dean-forest-tech.uk"
         }
     ],
     "support": {
         "issues": "https://github.com/silvercommerce/customisable-products/issues"
     },
     "require": {
-        "silvercommerce/catalogue-admin": "1.*@dev",
-        "silvercommerce/shoppingcart": "1.*@dev"
+        "silvercommerce/catalogue-admin": "^1.4",
+        "silvercommerce/shoppingcart": "^1.3"
     },
     "autoload": {
         "psr-4": {
