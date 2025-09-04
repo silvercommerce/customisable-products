@@ -20,33 +20,25 @@ use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverCommerce\CustomisableProducts\ProductCustomisation;
 
+/**
+ * A product that can be customised by the user, either
+ * through text entry or selection of options.
+ *
+ * @property int CustomisationListID
+ *
+ * @method ProductCustomisationList CustomisationList
+ * @method HasManyList Customisations
+ * @method HasManyList Variations
+ * @method ManyManyList CustomisationGroups
+ */
 class CustomisableProduct extends Product
 {
-    /**
-     * Table to create in DB
-     * 
-     * @var    string
-     * @config
-     */
     private static $table_name = "CustomisableProduct";
 
-    /**
-     * Human-readable singular name.
-     * @var string
-     * @config
-     */
     private static $singular_name = 'Customisable Product';
 
-    /**
-     * Human-readable plural name
-     * @var string
-     * @config
-     */
     private static $plural_name = 'Customisable Products';
 
-    /**
-     * @config
-     */
     private static $description = "A product that can be modified by the customer";
 
     private static $has_one = [
@@ -54,14 +46,29 @@ class CustomisableProduct extends Product
     ];
 
     private static $has_many = [
-        "Customisations" => ProductCustomisation::class
+        "Customisations" => ProductCustomisation::class,
+        "Variations" => CustomisableProductVariant::class
+    ];
+
+    private static $many_many = [
+        'CustomisationGroups' => ProductCustomisationGroup::class
+    ];
+
+    private static $owns = [
+        "Customisations"
     ];
 
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(
             function ($fields) {
-                $fields->removeByName("Root.Customisations");
+                $fields->removeByName(
+                    [
+                    "CustomisationListID",
+                    "Customisations",
+                    "Root.Customisations"
+                    ]
+                );
 
                 // Only add fields if the object exists
                 if ($this->ID) {
@@ -81,31 +88,36 @@ class CustomisableProduct extends Product
                         new GridFieldDataColumns(),
                         new GridFieldPaginator(20),
                         new GridFieldEditButton(),
-                        new GridFieldDeleteAction(),
                         new GridFieldDetailForm(),
                         new GridFieldOrderableRows('Sort')
                     );
 
                     $fields->addFieldsToTab(
                         'Root.Customisations',
-                        array(
-                        DropdownField::create(
-                            "CustomisationListID",
-                            _t("CustomisableProduct.UseCustomisationList", "Use a Customisation List"),
-                            ProductCustomisationList::get()->map()
-                        )->setEmptyString(
-                            _t(
-                                "CustomisableProduct.SelectList",
-                                "Select List"
-                            )
-                        ),
-                        GridField::create(
-                            'Customisations',
-                            '',
-                            $this->Customisations(),
-                            $custom_config
-                        )
-                        )
+                        [
+                            GridField::create(
+                                'CustomisationGroups',
+                                'Setup your customisations',
+                                $this->CustomisationGroups(),
+                                $custom_config
+                            ),
+                            /*DropdownField::create(
+                                "CustomisationListID",
+                                _t("CustomisableProduct.UseCustomisationList", "Use a Customisation List"),
+                                ProductCustomisationList::get()->map()
+                            )->setEmptyString(
+                                _t(
+                                    "CustomisableProduct.SelectList",
+                                    "Select List"
+                                )
+                            ),
+                            GridField::create(
+                                'Customisations',
+                                '',
+                                $this->Customisations(),
+                                $custom_config
+                            )*/
+                        ]
                     );
                 }
             }

@@ -23,38 +23,32 @@ class ProductCustomisation extends DataObject
 {
     /**
      * Identifier for a dropdown field
-     * 
+     *
      * @var string
      */
     const DROPDOWN_FIELD = 'Dropdown';
 
     /**
      * Identifier for a radio button set field
-     * 
+     *
      * @var string
      */
     const RADIO_FIELD = 'Radio';
 
     /**
      * Identifier for a checkbox set field
-     * 
+     *
      * @var string
      */
     const CHECKBOX_FIELD = 'Checkboxes';
 
     /**
      * Identifier for a text entry
-     * 
+     *
      * @var string
      */
     const TEXT_FIELD = 'TextEntry';
 
-    /**
-     * Table to create in DB
-     * 
-     * @var    string
-     * @config
-     */
     private static $table_name = "ProductCustomisation";
 
     private static $db = [
@@ -67,7 +61,8 @@ class ProductCustomisation extends DataObject
 
     private static $has_one = [
         'Parent'    => CustomisableProduct::class,
-        'List'      => ProductCustomisationList::class
+        'List'      => ProductCustomisationList::class,
+        'Group'     => ProductCustomisationGroup::class
     ];
 
     private static $has_many = array(
@@ -85,14 +80,14 @@ class ProductCustomisation extends DataObject
     {
         $this->beforeUpdateCMSFields(
             function ($fields) {
-                $fields->removeByName('Options');
-                $fields->removeByName('ParentID');
-                $fields->removeByName('Sort');
-                $fields->removeByName('MaxLength');
+                $fields->removeByName([
+                    'Options',
+                    'ParentID',
+                    'Sort',
+                    'MaxLength'
+                ]);
 
                 if ($this->ID && $this->DisplayAs != self::TEXT_FIELD) {
-                    $field_types = ProductCustomisationOption::singleton()->getFieldTypes();
-
                     // Deal with product features
                     $add_button = new GridFieldAddNewInlineButton('toolbar-header-left');
                     $add_button->setTitle('Add Customisation Option');
@@ -115,11 +110,20 @@ class ProductCustomisation extends DataObject
                 }
 
                 if ($this->ID && $this->DisplayAs == self::TEXT_FIELD) {
-                    $fields->addFieldToTab("Root.Main", TextField::create("MaxLength"));
+                    $fields->addFieldToTab(
+                        "Root.Main",
+                        TextField::create("MaxLength")
+                    );
                 }
 
                 if (!$this->ID) {
-                    $fields->addFieldToTab('Root.Main', LiteralField::create('CreateWarning', '<p>You need to create this before you can add options</p>'));
+                    $fields->addFieldToTab(
+                        'Root.Main',
+                        LiteralField::create(
+                            'CreateWarning',
+                            '<p>You need to create this before you can add options</p>'
+                        )
+                    );
                 }
             }
         );
@@ -129,7 +133,7 @@ class ProductCustomisation extends DataObject
 
     /**
      * Get the default options for this customisation
-     * 
+     *
      * @return SSList
      */
     public function DefaultOptions()
@@ -156,41 +160,41 @@ class ProductCustomisation extends DataObject
             $default = ($defaults->exists()) ? $defaults->first()->Title : null;
 
             switch ($this->DisplayAs) {
-            case self::DROPDOWN_FIELD:
-                $field = DropdownField::create(
-                    $name,
-                    $title,
-                    $options,
-                    $default
-                )->setEmptyString(
-                    _t(
-                        'CustomisableProducts.PleaseSelect',
-                        'Please Select'
-                    )
-                );
-                break;
-            case self::RADIO_FIELD:
-                $field = OptionsetField::create(
-                    $name,
-                    $title,
-                    $options,
-                    $default
-                );
-                break;
-            case self::CHECKBOX_FIELD:
-                $field = CheckboxSetField::create(
-                    $name,
-                    $title,
-                    $options,
-                    $defaults->column('ID')
-                );
-                break;
-            case self::TEXT_FIELD:
-                $field = TextField::create($name, $title);
-                if ($this->MaxLength) {
-                    $field->setMaxLength($this->MaxLength);
-                }
-                break;
+                case self::DROPDOWN_FIELD:
+                    $field = DropdownField::create(
+                        $name,
+                        $title,
+                        $options,
+                        $default
+                    )->setEmptyString(
+                        _t(
+                            'CustomisableProducts.PleaseSelect',
+                            'Please Select'
+                        )
+                    );
+                    break;
+                case self::RADIO_FIELD:
+                    $field = OptionsetField::create(
+                        $name,
+                        $title,
+                        $options,
+                        $default
+                    );
+                    break;
+                case self::CHECKBOX_FIELD:
+                    $field = CheckboxSetField::create(
+                        $name,
+                        $title,
+                        $options,
+                        $defaults->column('ID')
+                    );
+                    break;
+                case self::TEXT_FIELD:
+                    $field = TextField::create($name, $title);
+                    if ($this->MaxLength) {
+                        $field->setMaxLength($this->MaxLength);
+                    }
+                    break;
             }
 
             $this->extend('updateField', $field);

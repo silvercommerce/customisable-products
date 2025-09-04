@@ -8,12 +8,6 @@ use SilverStripe\SiteConfig\SiteConfig;
 
 class ProductCustomisationOption extends DataObject
 {
-    /**
-     * Table to create in DB
-     * 
-     * @var    string
-     * @config
-     */
     private static $table_name = "ProductCustomisationOption";
 
     private static $db = [
@@ -25,6 +19,10 @@ class ProductCustomisationOption extends DataObject
 
     private static $has_one = [
         "Parent"        => ProductCustomisation::class
+    ];
+
+    private static $belongs_many_many = [
+        'Variants'      => CustomisableProductVariant::class
     ];
 
     private static $casting = [
