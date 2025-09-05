@@ -3,11 +3,9 @@
 namespace SilverCommerce\CustomisableProducts;
 
 use LogicException;
-use SilverStripe\ORM\ArrayList;
 use SilverCommerce\OrdersAdmin\Factory\LineItemFactory;
 use SilverCommerce\OrdersAdmin\Interfaces\LineItemPricable;
 use SilverCommerce\OrdersAdmin\Interfaces\LineItemCustomisable;
-use SilverStripe\ORM\SS_List;
 
 class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
 {
