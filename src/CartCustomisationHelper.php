@@ -46,8 +46,11 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
         $product = $item->findStockItem();
 
         if (!$product instanceof CustomisableProduct) {
-            return;
+            throw new LogicException('Product is not customisable');
         }
+
+        // Collect all option ID's and find the relevent variant.
+        $option_ids = [];
 
         foreach ($data as $key => $value) {
             if (!$this->isDataCustomisation($key)) {
@@ -55,23 +58,38 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
             }
 
             $custom_item = $this->getProductCustomisation($key);
-            $modify = 0;
 
-            $option = $custom_item
-                ->Options()
-                ->find("Title", $value);
-
-            if (!empty($option)) {
-                $modify = $option->ModifyPrice;
+            if ($custom_item->DisplayAs !== ProductCustomisation::TEXT_FIELD) {
+                $option_ids[] = (int)$value;
             }
+        }
 
-            if (!(round($modify, 2) === 0.00)) {
-                $factory->modifyPrice(
-                    $custom_item->Title,
-                    (float)$option->ModifyPrice,
-                    $option
-                );
-            }
+        if (count($option_ids) === 0) {
+            throw new LogicException('No customisation options found');
+        }
+
+        $options = ProductCustomisationOption::get()
+            ->filter('ID', $option_ids)
+            ->toArray();
+
+        if (empty($options)) {
+            throw new LogicException('No customisation options found');
+        }
+
+        $variant = $product->findVariationByOptions(
+            $options
+        );
+
+        if (empty($variant) ) {
+            throw new LogicException('No matching variant found');
+        }
+
+        if (!empty($variant) || !$variant->exists()) {
+            $factory->modifyPrice(
+                $variant->Title,
+                $variant->BasePrice - $product->BasePrice,
+                $variant
+            );
         }
 
         return;
@@ -85,7 +103,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
         $product = $item->findStockItem();
 
         if (!$product instanceof CustomisableProduct) {
-            return;
+            throw new LogicException('Product is not customisable');
         }
 
         foreach ($data as $key => $value) {
@@ -103,7 +121,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
             } else {
                 $option = $custom_item
                     ->Options()
-                    ->find("Title", $value);
+                    ->find("ID", $value);
 
                 if (empty($option)) {
                     throw new LogicException('Invalid customisation option');
