@@ -1,0 +1,47 @@
+{
+  "name": "silvercommerce-customisable-products",
+  "description": "SilverCommerce module that adds customisable products (adding dropdowns, radio buttons or textfields to a product)",
+  "scripts": {
+    "build": "yarn && yarn lint && rm -rf client/dist/* && NODE_ENV=production webpack --mode production --bail --progress",
+    "dev": "NODE_ENV=development webpack --progress",
+    "watch": "NODE_ENV=development webpack --watch --progress",
+    "css": "WEBPACK_CHILD=css npm run build",
+    "lint": "yarn lint-js && yarn lint-sass",
+    "lint-js": "eslint client/src",
+    "lint-js-fix": "eslint client/src --fix",
+    "lint-sass": "stylelint client/src",
+    "test": "true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silvercommerce/customisable-products.git"
+  },
+  "keywords": [
+    "silverstripe",
+    "silvercommerce"
+  ],
+  "author": "Dean Forest Tech",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/silvercommerce/customisable-products/issues"
+  },
+  "homepage": "https://github.com/silvercommerce/customisable-products#readme",
+  "devDependencies": {
+    "@silverstripe/eslint-config": "^1.5.0",
+    "@silverstripe/webpack-config": "^3",
+    "eslint": "^8.26.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "js-image-zoom": "^0.7.0",
+    "postcss": "^8.5.6",
+    "stylelint": "^16.3.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "resolutions": {
+    "colors": "1.4.0"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "packageManager": "yarn@4.9.4"
+}

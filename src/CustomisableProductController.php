@@ -19,6 +19,9 @@ class CustomisableProductController extends ProductController
     {
         parent::init();
 
+        Requirements::css(
+            'silvercommerce/customisable-products: client/dist/styles/main.css'
+        );
         Requirements::javascript(
             'silvercommerce/customisable-products: client/dist/js/main.bundle.js'
         );
