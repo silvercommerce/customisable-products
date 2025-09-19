@@ -2,6 +2,7 @@
 
 namespace SilverCommerce\CustomisableProducts\Tests;
 
+use ReflectionClass;
 use SilverStripe\Dev\SapphireTest;
 use SilverCommerce\CustomisableProducts\CustomisableProduct;
 use SilverCommerce\CustomisableProducts\ProductCustomisationGroup;
@@ -10,7 +11,7 @@ use SilverCommerce\CustomisableProducts\ProductCustomisationOption;
 
 class ProductCustomisationGroupTest extends SapphireTest
 {
-    protected static $fixture_file = 'ProductCustomisationGroupTest.yml';
+    protected static $fixture_file = 'CustomisableProducts.yml';
 
     public function testGenerateVariations()
     {
