@@ -167,20 +167,7 @@ class ProductCustomisationGroup extends DataObject
         array $options,
         CustomisableProduct $product
     ) {
-        $existing = $product
-            ->Variations();
-
-        // Ensure that we look for an existing variation
-        // with the provided combination of options
-        foreach ($options as $option) {
-            $existing = $existing->addFilter(
-                [
-                "Options.ID" => $option->ID
-                ]
-            );
-        }
-
-        $existing = $existing->first();
+        $existing = $product->findVariationByOptions($options);
 
         if (!empty($existing)) {
             return $existing;

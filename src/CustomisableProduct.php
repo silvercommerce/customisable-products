@@ -5,20 +5,18 @@ namespace SilverCommerce\CustomisableProducts;
 use Product;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\ArrayList;
-use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
 use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldEditButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
-use SilverCommerce\OrdersAdmin\Factory\LineItemFactory;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverCommerce\CustomisableProducts\ProductCustomisation;
+use SilverStripe\ORM\ManyManyList;
 
 /**
  * A product that can be customised by the user, either
@@ -42,11 +40,12 @@ class CustomisableProduct extends Product
     private static $description = "A product that can be modified by the customer";
 
     private static $has_one = [
+        // Legacy support for single customisation list
         "CustomisationList" => ProductCustomisationList::class
     ];
 
     private static $has_many = [
-        "Customisations" => ProductCustomisation::class,
+        "Customisations" => ProductCustomisation::class, //Legacy
         "Variations" => CustomisableProductVariant::class
     ];
 
@@ -55,8 +54,75 @@ class CustomisableProduct extends Product
     ];
 
     private static $owns = [
-        "Customisations"
+        "Customisations",
+        "Variations"
     ];
+
+    private static $cascade_deletes = [
+        "Customisations",
+        "Variations"
+    ];
+
+    public function getSortedCustomisationGroups(): ManyManyList
+    {
+        return $this
+            ->CustomisationGroups()
+            ->sort('Sort ASC');
+    }
+
+    public function getCompiledCustomisations(): SS_List
+    {
+        $list = ArrayList::create();
+        $groups = $this->getSortedCustomisationGroups();
+
+        if ($groups->count()) {
+            foreach ($groups as $group) {
+                $list->merge($group->getSortedCustomisations());
+            }
+        }
+
+        return $list;
+    }
+
+    public function findVariationByOptions(array $options): ?CustomisableProductVariant
+    {
+        if (count($options) === 0) {
+            return null;
+        }
+
+        $ids = array_map(
+            function ($item) {
+                return $item->ID;
+            },
+            $options
+        );
+
+        // SilverStripe does not always return variants consistently
+        // via has_many, so get them manually.
+        $variations = CustomisableProductVariant::get()
+            ->filter('ParentID', $this->ID);
+
+        $existing = $variations
+            ->filterByCallback(function ($item) use ($ids) {
+                /** @var CustomisableProductVariant $item */
+                $option_ids = $item->Options()->column('ID');
+
+                $diff_one = array_diff($ids, $option_ids);
+                $diff_two = array_diff($option_ids, $ids);
+                
+                if (count($diff_one) > 0 || count($diff_two) > 0) {
+                    return false;
+                }
+
+                return true;
+            })->first();
+
+        if (empty($existing)) {
+            return null;
+        }
+
+        return $existing;
+    }
 
     public function getCMSFields()
     {
@@ -64,6 +130,7 @@ class CustomisableProduct extends Product
             function ($fields) {
                 $fields->removeByName(
                     [
+                    "CustomisationGroups",
                     "CustomisationListID",
                     "Customisations",
                     "Root.Customisations"
@@ -100,26 +167,25 @@ class CustomisableProduct extends Product
                                 'Setup your customisations',
                                 $this->CustomisationGroups(),
                                 $custom_config
-                            ),
-                            /*DropdownField::create(
-                                "CustomisationListID",
-                                _t("CustomisableProduct.UseCustomisationList", "Use a Customisation List"),
-                                ProductCustomisationList::get()->map()
-                            )->setEmptyString(
-                                _t(
-                                    "CustomisableProduct.SelectList",
-                                    "Select List"
-                                )
-                            ),
-                            GridField::create(
-                                'Customisations',
-                                '',
-                                $this->Customisations(),
-                                $custom_config
-                            )*/
+                            )
                         ]
                     );
                 }
+
+                $variations_field = $fields
+                    ->dataFieldByName('Variations');
+
+                if (!empty($variations_field)) {
+                    $variations_field
+                        ->setConfig(GridFieldConfig_ProductVariation::create());
+
+                    $fields->addFieldToTab(
+                        'Root.Customisations',
+                        $variations_field
+                    );
+                }
+
+                $fields->removeByName('Variations');
             }
         );
 
