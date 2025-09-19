@@ -155,7 +155,7 @@ class ProductCustomisation extends DataObject
         if ($this->Title && $this->DisplayAs) {
             $name = "customise_{$this->ID}_" . Convert::raw2url($this->Title);
             $title = ($this->Required) ? $this->Title . ' *' : $this->Title;
-            $options = $this->Options()->map('Title', 'ItemSummary');
+            $options = $this->Options()->map('ID', 'Title');
             $defaults = $this->DefaultOptions();
             $default = ($defaults->exists()) ? $defaults->first()->Title : null;
 
