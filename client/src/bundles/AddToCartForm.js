@@ -83,6 +83,11 @@ import ImageZoom from 'js-image-zoom';
             mainImage.style.opacity = 1;
           };
         }
+
+        // Finally update history
+        if (typeof (history.pushState) !== 'undefined') {
+          history.pushState({}, '', response.url);
+        }
       }
     };
 

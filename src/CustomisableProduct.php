@@ -5,6 +5,9 @@ namespace SilverCommerce\CustomisableProducts;
 use Product;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
 use SilverStripe\Forms\GridField\GridFieldPaginator;
@@ -16,7 +19,6 @@ use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverCommerce\CustomisableProducts\ProductCustomisation;
-use SilverStripe\ORM\ManyManyList;
 
 /**
  * A product that can be customised by the user, either
@@ -82,6 +84,51 @@ class CustomisableProduct extends Product
         }
 
         return $list;
+    }
+
+    public function getBasePrice()
+    {
+        $variation = $this->getChosenVariation();
+
+        if (!empty($variation)) {
+            return $variation->getBasePrice();
+        }
+
+        return $this->dbObject('BasePrice')->getValue();
+    }
+
+    public function PrimaryImage()
+    {
+        $variation = $this->getChosenVariation();
+
+        if (!empty($variation) && $variation->Image()->exists()) {
+            return $variation->Image();
+        }
+
+        return parent::PrimaryImage();
+    }
+
+    public function getChosenVariation(): ?CustomisableProductVariant
+    {
+        $request = Injector::inst()->get(HTTPRequest::class);
+        $ids = $request->getVar('o');
+
+        if (empty($ids)) {
+            return null;
+        }
+
+        $ids = explode(',', $ids);
+        $options = [];
+
+        if (count($ids) === 0) {
+            return null;
+        }
+
+        $options = ProductCustomisationOption::get()
+            ->filter('ID', $ids)
+            ->toArray();
+
+        return $this->findVariationByOptions($options);
     }
 
     public function findVariationByOptions(array $options): ?CustomisableProductVariant

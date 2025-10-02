@@ -32,28 +32,9 @@ class CustomisableProductController extends ProductController
         return $this->Link('customisationdata');
     }
 
-    public function customisationdata(HTTPRequest $request)
+    public function customisationdata()
     {
-        /** @var CustomisableProduct */
-        $record = $this->dataRecord;
-        $ids = $request->getVar('o');
-
-        if (empty($ids)) {
-            return $this->httpError(500);
-        }
-
-        $ids = explode(',', $ids);
-        $options = [];
-
-        if (count($ids) === 0) {
-            return $this->httpError(500);
-        }
-
-        $options = ProductCustomisationOption::get()
-            ->filter('ID', $ids)
-            ->toArray();
-
-        $variant = $record->findVariationByOptions($options);
+        $variant = $this->getChosenVariation();
 
         if (empty($variant)) {
             return $this->httpError(404);
@@ -74,6 +55,7 @@ class CustomisableProductController extends ProductController
             'isrc' => $image_url,
             'price' => (string)$variant->getNicePrice(),
             'stockid' => $variant->StockID,
+            'url' => $variant->AbsoluteLink()
         ];
 
         $response = $this
@@ -89,7 +71,8 @@ class CustomisableProductController extends ProductController
     {
         return CustomisableAddToCartForm::create(
             $this,
-            'AddToCartForm'
+            'AddToCartForm',
+            $this->getChosenVariation()
         );
     }
 }

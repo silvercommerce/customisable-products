@@ -13,6 +13,7 @@ use SilverCommerce\TaxAdmin\Model\TaxRate;
 use SilverCommerce\TaxAdmin\Traits\Taxable;
 use SilverCommerce\TaxAdmin\Interfaces\TaxableProvider;
 use SilverCommerce\CustomisableProducts\ProductCustomisationOption;
+use SilverStripe\Control\Director;
 
 /**
  * A specific variant of a customisable product, defined by
@@ -73,6 +74,24 @@ class CustomisableProductVariant extends DataObject implements TaxableProvider
             ->getValue();
     }
 
+    public function RelativeLink()
+    {
+        $link = $this->Parent()->RelativeLink();
+        $link .= '?o=' . $this->getOptionsForURL();
+
+        return $link;
+    }
+
+    public function Link()
+    {
+        return $this->RelativeLink();
+    }
+
+    public function AbsoluteLink()
+    {
+        return Director::absoluteURL($this->RelativeLink());
+    }
+
     public function getShowPriceWithTax(): bool
     {
         return $this->Parent()->getShowPriceWithTax();
@@ -101,6 +120,31 @@ class CustomisableProductVariant extends DataObject implements TaxableProvider
             ->column('Title');
 
         return implode(', ', $options);
+    }
+
+    public function getOptionsForURL(): string
+    {
+        $options = $this
+            ->Options()
+            ->sort('Title ASC')
+            ->column('ID');
+
+        return implode(',', $options);
+    }
+
+    public function getCustomisationValue(
+        ProductCustomisation $customisation
+    ): ?string {
+        $option = $this
+            ->Options()
+            ->filter('ParentID', $customisation->ID)
+            ->first();
+
+        if ($option) {
+            return $option->ID;
+        }
+
+        return null;
     }
 
     /**

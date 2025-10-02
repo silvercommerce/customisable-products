@@ -2,14 +2,19 @@
 
 namespace SilverCommerce\CustomisableProducts;
 
+use Dom\Text;
 use SilverCommerce\ShoppingCart\Forms\AddToCartForm;
 use SilverCommerce\ShoppingCart\ShoppingCartFactory;
+use SilverStripe\Forms\TextField;
 
 class CustomisableAddToCartForm extends AddToCartForm
 {
+
+
     public function __construct(
         CustomisableProductController $controller,
         $name = self::DEFAULT_NAME,
+        ?CustomisableProductVariant $variant = null
     ) {
         parent::__construct($controller, $name);
 
@@ -31,6 +36,12 @@ class CustomisableAddToCartForm extends AddToCartForm
             $field = $customisation
                 ->Field()
                 ->addExtraClass("product-customisation-field");
+
+            if (!empty($variant && !is_a($field, TextField::class))) {
+                $field->setValue(
+                    $variant->getCustomisationValue($customisation)
+                );
+            }
 
             $this
                 ->Fields()
