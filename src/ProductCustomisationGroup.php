@@ -6,8 +6,10 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverCommerce\CustomisableProducts\ProductCustomisation;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\ORM\DataObject;
+use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 /**
  * Generic container for customisations that can be applied
@@ -71,6 +73,11 @@ class ProductCustomisationGroup extends DataObject
                     ->dataFieldByName("Customisations");
 
                 if (!empty($customisations)) {
+                    $config = $customisations->getConfig();
+                    $config
+                        ->removeComponentsByType(GridFieldDeleteAction::class)
+                        ->addComponent(new GridFieldOrderableRows('Sort'));
+
                     $fields->addFieldToTab(
                         "Root.Main",
                         $customisations
