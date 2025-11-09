@@ -11,9 +11,10 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 class SiteConfigExtension extends DataExtension
 {
     private static $has_many = [
+        "ProductCustomisationGroups" => ProductCustomisationGroup::class,
         "ProductCustomisationLists" => ProductCustomisationList::class
     ];
-    
+
     public function updateCMSFields(FieldList $fields)
     {
         $fields->addFieldTotab(
@@ -23,9 +24,9 @@ class SiteConfigExtension extends DataExtension
                 _t("CustomisableProducts.CustomisableProducts", "Customisable Products"),
                 [
                     GridField::create(
-                        'ProductCustomisationLists',
+                        'ProductCustomisationGroups',
                         '',
-                        $this->owner->ProductCustomisationLists(),
+                        $this->owner->ProductCustomisationGroups(),
                         GridFieldConfig_RecordEditor::create()
                     )
                 ]
@@ -38,7 +39,7 @@ class SiteConfigExtension extends DataExtension
         parent::onBeforeDelete();
 
         // Clean up customisations
-        foreach ($this->ProductCustomisationLists() as $customisation) {
+        foreach ($this->getOwner()->ProductCustomisationLists() as $customisation) {
             $customisation->delete();
         }
     }

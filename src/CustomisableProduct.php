@@ -19,6 +19,9 @@ use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverCommerce\CustomisableProducts\ProductCustomisation;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 
 /**
  * A product that can be customised by the user, either
@@ -187,24 +190,22 @@ class CustomisableProduct extends Product
                 // Only add fields if the object exists
                 if ($this->ID) {
                     // Deal with customisations
-                    $add_button = new GridFieldAddNewButton('toolbar-header-left');
+                    $add_button = new GridFieldAddNewButton('buttons-before-left');
                     $add_button->setButtonName(
                         _t(
                             "CustomisableProduct.AddCustomisation",
-                            "Add Customisation"
+                            "Add New Customisation"
                         )
                     );
 
-                    $custom_config = GridFieldConfig::create()->addComponents(
-                        new GridFieldToolbarHeader(),
-                        $add_button,
-                        new GridFieldSortableHeader(),
-                        new GridFieldDataColumns(),
-                        new GridFieldPaginator(20),
-                        new GridFieldEditButton(),
-                        new GridFieldDetailForm(),
-                        new GridFieldOrderableRows('Sort')
-                    );
+                    $custom_config = GridFieldConfig_RelationEditor::create();
+                    
+                    $custom_config
+                        ->removeComponentsByType(GridFieldAddNewButton::class)
+                        ->addComponents(
+                            $add_button,
+                            new GridFieldOrderableRows('Sort')
+                        );
 
                     $fields->addFieldsToTab(
                         'Root.Customisations',
@@ -237,6 +238,16 @@ class CustomisableProduct extends Product
         );
 
         return parent::getCMSFields();
+    }
+
+    public function onAfterWrite()
+    {
+        parent::onAfterWrite();
+
+        // Build all customisation variations
+        foreach ($this->CustomisationGroups() as $group) {
+            $group->generateVariations($this);
+        }
     }
 
     public function onBeforeDelete()

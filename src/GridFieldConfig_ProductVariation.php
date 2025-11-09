@@ -4,6 +4,7 @@ namespace SilverCommerce\CustomisableProducts;
 
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
@@ -63,9 +64,12 @@ class GridFieldConfig_ProductVariation extends GridFieldConfig
             ]
         ]);
 
-        $this->addComponent(new GridFieldToolbarHeader());
-        $this->addComponent(new GridFieldSortableHeader());
-        $this->addComponent($columns);
-        $this->addComponent(new GridFieldDetailForm());
+        $this->addComponents(
+            new GridFieldToolbarHeader(),
+            new GridFieldSortableHeader(),
+            $columns,
+            new GridFieldDetailForm(),
+            new GridFieldDeleteAction()
+        );
     }
 }
