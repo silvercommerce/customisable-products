@@ -30,13 +30,25 @@ import ImageZoom from 'js-image-zoom';
     const xhr = createXhr();
     let params = '?o=';
 
+    console.log(fields);
+
     // Find customisation fields and append their
     // values to the URL
     fields.forEach(element => {
       let value = 0;
 
-      // If no value, set to 0
-      if (element.value > 0) {
+      // Manage select
+      if (element.tagName.toLowerCase() === 'select'
+        && element.value > 0
+      ) {
+        value = element.value;
+      }
+
+      // Manage radio and checkboxes
+      if (element.tagName.toLowerCase() === 'input'
+          && element.type.toLowerCase() === 'radio'
+          && element.checked
+      ) {
         value = element.value;
       }
 
@@ -101,17 +113,24 @@ import ImageZoom from 'js-image-zoom';
     xhr.send();
   }
 
-  const customfields = document
-    .querySelectorAll('form.product-customisation-form select');
+  const customisationForm = document
+    .querySelector('form.product-customisation-form');
+
+  if (document.contains(customisationForm) === false) {
+    return;
+  }
+
+  const customfields = customisationForm
+    .querySelectorAll('select, input[type="radio"]');
 
   customfields.forEach((element) => {
-    if (!element.classList.contains('product-customisation-field')) {
-      return;
+    if (element.classList.contains('product-customisation-field')
+      || element.parentElement.classList.contains('product-customisation-field')
+    ) {
+      element.addEventListener(
+        'change',
+        (event) => { xhrRequest(event, customfields); }
+      );
     }
-
-    element.addEventListener(
-      'change',
-      (event) => { xhrRequest(event, customfields); }
-    );
   });
 }(document, window));
