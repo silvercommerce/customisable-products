@@ -30,8 +30,6 @@ import ImageZoom from 'js-image-zoom';
     const xhr = createXhr();
     let params = '?o=';
 
-    console.log(fields);
-
     // Find customisation fields and append their
     // values to the URL
     fields.forEach(element => {
