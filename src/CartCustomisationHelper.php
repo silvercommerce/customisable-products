@@ -46,7 +46,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
         $product = $item->findStockItem();
 
         if (!$product instanceof CustomisableProduct) {
-            throw new LogicException('Product is not customisable');
+            return;
         }
 
         // Collect all option ID's and find the relevent variant.
@@ -103,7 +103,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
         $product = $item->findStockItem();
 
         if (!$product instanceof CustomisableProduct) {
-            throw new LogicException('Product is not customisable');
+            return;
         }
 
         foreach ($data as $key => $value) {
