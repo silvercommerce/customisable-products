@@ -178,14 +178,12 @@ class CustomisableProduct extends Product
     {
         $this->beforeUpdateCMSFields(
             function ($fields) {
-                $fields->removeByName(
-                    [
+                $fields->removeByName([
                     "CustomisationGroups",
                     "CustomisationListID",
                     "Customisations",
                     "Root.Customisations"
-                    ]
-                );
+                ]);
 
                 // Only add fields if the object exists
                 if ($this->ID) {

@@ -71,6 +71,8 @@ class ProductCustomisationGroup extends DataObject
                 // Move customisations to main tab
                 $customisations = $fields
                     ->dataFieldByName("Customisations");
+                
+                $fields->removeByName("Customisations");
 
                 if (!empty($customisations)) {
                     $config = $customisations->getConfig();
@@ -83,6 +85,8 @@ class ProductCustomisationGroup extends DataObject
                         $customisations
                     );
                 }
+
+                
             }
         );
 
