@@ -39,7 +39,7 @@ class CartCustomisationHelper implements LineItemPricable, LineItemCustomisable
     ): void {
         $item = $factory->getItem();
 
-        if (empty($item)) {
+        if (empty($item) || empty($data)) {
             return;
         }
 
